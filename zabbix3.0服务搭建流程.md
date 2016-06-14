@@ -62,3 +62,4 @@ Server=192.168.56.11
 
 登录初始用户和密码分别为：Admin  zabbix
 
+![](file:///D:\github\study)
