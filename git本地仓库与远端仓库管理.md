@@ -1,5 +1,26 @@
 #Git 使用
 
+## linux 服务器创建本地仓库
+
+* 登录一台Linux服务器，建立目录
+
+* 初始化仓库
+* 创建公私钥
+* 拷贝公钥到github的 右上角头像--setting--SSH and GPG keys--New SSH key
+* 在本地仓库克隆需要仓库地址（地址在点开仓库右边有个Clone or download）
+
+具体操作如下
+<pre>
+mkdir /xiedi
+cd /xiedi
+git init
+ssh-keygen -t rsa -C "linux_xd@sina.com"
+cat .ssh/id_rsa.pub
+复制到github 的pub key 即可
+
+</pre>
+
+
 ## git远程仓库和本地仓库使用
 
 * 拉仓库下来
