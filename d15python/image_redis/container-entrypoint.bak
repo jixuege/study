@@ -1,0 +1,50 @@
+#!/bin/sh
+
+set -e
+
+# 初始化磁盘
+#mount /dev/sdb /tmp
+if [ -z $LOCATION ];then
+   mkdir /test
+	mount $DEV /test
+
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:redis]
+command=/redis/redis-server /redis/conf/redis.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/redis_out.log
+stderr_logfile=/var/log/supervisor/redis_err.log
+
+EOF
+exec /usr/bin/supervisord -n
+exit
+
+fi
+
+if [ -z $DEV ];then
+	echo "error"
+exit
+fi
+
+mount $DEV $LOCATION
+echo "init disk"
+# 初始化服务配置
+echo "init service configure"
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:redis]
+command=/redis/redis-server /redis/conf/redis.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/redis_out.log
+stderr_logfile=/var/log/supervisor/redis_err.log
+
+EOF
+
+# 初始化
+
+# 启动服务
+#exec "supervisord -n"
+exec /usr/bin/supervisord -n
+#exec "/usr/local/nginx/sbin/nginx -g "daemon off;" -c /usr/local/nginx/conf/nginx.conf"
+#exec /usr/sbin/sshd -D

@@ -1,0 +1,95 @@
+#!/bin/sh
+
+set -x
+
+DEFAULT_MOUNT="test"
+
+# 未传入参数LOCATION
+if [ "x$LOCATION" == "x" ]&&[ "x$DEV" != "x" ];then
+if [ -a /root/$DEFAULT_MOUNT ];then
+mount $DEV $DEFAULT_MOUNT
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/openresty/nginx/sbin/nginx -g "daemon off;" -c /usr/local/openresty/nginx/conf/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+else
+mkdir -p $DEFAULT_MOUNT
+mount $DEV $DEFAULT_MOUNT
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/openresty/nginx/sbin/nginx -g "daemon off;" -c /usr/local/openresty/nginx/conf/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+fi
+
+
+#未传入参数DEV
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" == "x" ];then
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/openresty/nginx/sbin/nginx -g "daemon off;" -c /usr/local/openresty/nginx/conf/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+
+
+
+#DEV和LOCATION都传入
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" != "x" ];then
+if [ -a $LOCATION ];then
+mount $DEV $LOCATION
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/openresty/nginx/sbin/nginx -g "daemon off;" -c /usr/local/openresty/nginx/conf/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+else
+mkdir -p $LOCATION
+mount $DEV $LOCATION
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/openresty/nginx/sbin/nginx -g "daemon off;" -c /usr/local/openresty/nginx/conf/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+fi

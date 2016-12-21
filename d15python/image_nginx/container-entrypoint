@@ -1,0 +1,125 @@
+#!/bin/sh
+
+set -x
+
+DEFAULT_MOUNT="test"
+
+# 未传入参数LOCATION
+if [ "x$LOCATION" == "x" ]&&[ "x$DEV" != "x" ];then
+if [ -a /root/$DEFAULT_MOUNT ];then
+mount $DEV $DEFAULT_MOUNT
+cp  /date/nginx.conf /$DEFAULT_MOUNT
+cp  /date/mime.types /$DEFAULT_MOUNT
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/nginx/sbin/nginx -g "daemon off;" -c /usr/local/src/nginx-1.10.1/test/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+else
+mkdir -p $DEFAULT_MOUNT
+mount $DEV $DEFAULT_MOUNT
+cp  /date/nginx.conf $DEFAULT_MOUNT
+cp  /date/mime.types $DEFAULT_MOUNT
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/nginx/sbin/nginx -g "daemon off;" -c /usr/local/src/nginx-1.10.1/test/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+
+
+#未传入参数DEV
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" == "x" ];then
+cp  /date/nginx.conf $LOCATION
+cp  /date/mime.types $LOCATION
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/nginx/sbin/nginx -g "daemon off;" -c $LOCATION/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+
+
+
+#DEV和LOCATION都传入
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" != "x" ];then
+if [ -a $LOCATION ];then
+mount $DEV $LOCATION
+cp  /date/nginx.conf $LOCATION
+cp  /date/mime.types $LOCATION
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/nginx/sbin/nginx -g "daemon off;" -c ${LOCATION}/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+else
+mkdir -p $LOCATION
+mount $DEV $LOCATION
+cp  /date/nginx.conf $LOCATION
+cp  /date/mime.types $LOCATION
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/nginx/sbin/nginx -g "daemon off;" -c ${LOCATION}/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+fi
+
+
+if [ "x$LOCATION" == "x" ]&&[ "x$DEV" == "x" ];then
+cp  /date/nginx.conf /etc
+cp  /date/mime.types /etc
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:nginx]
+command=/usr/local/nginx/sbin/nginx -g "daemon off;" -c /etc/nginx.conf
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx_out.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+

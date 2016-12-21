@@ -1,0 +1,44 @@
+# This dockerfile uses the centos 7 image
+# Python 2.7 Dockerfile for mount
+# Version 1.0
+# Author: Leon xie
+
+# Pull base images.
+FROM gw-server20160922 
+
+# Define author info.
+MAINTAINER jsjyw-yunjiayuan xie.di@jyall.com
+
+
+#ADD
+ADD ./supervisord.conf /etc/supervisord.conf
+ADD container-entrypoint /container-entrypoint
+RUN chmod +x  /container-entrypoint
+
+
+#ADD
+RUN yum -y install shellinabox supervisor
+ADD ./supervisord.conf /etc/supervisord.conf
+
+
+RUN rm -f /etc/sysconfig/shellinaboxd
+RUN useradd test &&  echo "test:test"|chpasswd
+COPY package/cfg.json /root/cfg.json
+COPY package/control /root/control
+COPY package/white-on-black.css /usr/share/shellinabox/white-on-black.css
+COPY package/shellinaboxd /etc/sysconfig/shellinaboxd
+
+#give +x
+RUN chmod +x /root/control
+
+#for openvpn
+RUN mkdir -p /dev/net/ && \
+    mknod /dev/net/tun c 10 200 && \
+    chmod 600 /dev/net/tun
+
+#Env
+ENV LANG zh_CN.UTF-8
+#ENV LC_ALL zh_CN.UTF-8
+
+#Define default command.
+CMD ["/container-entrypoint"]

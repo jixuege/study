@@ -1,0 +1,39 @@
+#!/bin/sh
+
+set -x
+
+DEFAULT_POINT="/data"
+
+if [ "x$DEV" != "x" ] && [ -b "$DEV" ];then
+   if [ "x$LOCATION" == "x" ];then
+      if [ ! -d "$LOCATION" ];then
+         mkdir $DEFAULT_POINT
+         mount $DEV $DEFAULT_POINT
+         if [ $? -ne 0 ];then
+            exit 1
+         fi
+      else
+         mount $DEV $DEFAULT_POINT
+         if [ $? -ne 0 ];then
+            exit 1
+         fi
+      fi
+   else
+      if [ ! -d "$LOCATION" ];then
+         mkdir $LOCATION
+         mount $DEV $LOCATION
+         if [ $? -ne 0 ];then
+            exit 1
+         fi
+      else
+         mount $DEV $LOCATION
+         if [ $? -ne 0 ];then
+            exit 1
+         fi
+      fi
+   fi
+   exec /usr/bin/supervisord -n
+else
+   exec /usr/bin/supervisord -n
+fi
+
