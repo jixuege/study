@@ -1,0 +1,47 @@
+#!/bin/sh
+
+set -x
+
+DEFAULT_MOUNT="test"
+
+# 未传入参数LOCATION
+if [ "x$LOCATION" == "x" ]&&[ "x$DEV" != "x" ];then
+    if [ -a /root/$DEFAULT_MOUNT ];then
+        mount $DEV /root/$DEFAULT_MOUNT
+        exec /usr/bin/supervisord -n
+        exit
+    else
+        mkdir -p /root/$DEFAULT_MOUNT    
+        mount $DEV /root/$DEFAULT_MOUNT
+        exec /usr/bin/supervisord -n
+        exit
+    fi
+fi
+
+
+#未传入参数DEV
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" == "x" ];then
+    exec /usr/bin/supervisord -n
+    exit
+fi
+
+
+
+#DEV和LOCATION都传入
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" != "x" ];then
+    if [ -a $LOCATION ];then
+       mount $DEV $LOCATION
+       exec /usr/bin/supervisord -n
+       exit
+else
+       mkdir -p $LOCATION
+       mount $DEV $LOCATION
+       exec /usr/bin/supervisord -n
+       exit
+    fi
+fi
+
+if [ "x$LOCATION" == "x" ]&&[ "x$DEV" == "x" ];then
+    exec /usr/bin/supervisord -n
+    exit
+fi

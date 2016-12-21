@@ -1,0 +1,45 @@
+#!/bin/sh
+
+set -e
+
+# 初始化磁盘
+#mount /dev/sdb /tmp
+if [ -z $LOCATION ];then
+   mkdir /test
+#	mount $DEV /tmp
+
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:mariadb]
+command= /usr/libexec/mysqld --user=mysql
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/mariadb_out.log
+stderr_logfile=/var/log/supervisor/mariadb_err.log
+
+EOF
+exec /usr/bin/supervisord -n
+exit
+
+fi
+
+if [ -z $DEV ];then
+	echo "error"
+exit
+fi
+
+mount $DEV $LOCATION
+echo "init disk"
+# 初始化服务配置
+echo "init service configure"
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:mariadb]
+command= /usr/libexec/mysqld --user=mysql
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/mariadb_out.log
+stderr_logfile=/var/log/supervisor/mariadb_err.log
+
+EOF
+
+# 启动服务
+exec /usr/bin/supervisord -n
