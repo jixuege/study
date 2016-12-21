@@ -1,0 +1,9 @@
+1.0 最新版本的java容器
+1.1 在container-entrypoint脚本中添加了无$LOCATHIO和无$DEV的情况
+2.0 替换了原来的container-entrypoint脚本
+2.1 替换了原来的container-entrypoint脚本做了dos2unix 
+1.0 给预发布环境配置，加入root用户
+2.2 给预发布环境配置，备用root用户
+3.0 给预发布环境配置，备用加入dataserver
+3.1 新增GIT服务
+3.2 新加scp

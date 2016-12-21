@@ -1,0 +1,20 @@
+#!/bin/sh
+set -x
+#LOCATION is mount place
+#DEV is Device name
+DEFAULT_MOUNT="test"
+#mount /dev/sdb /tmp
+if [ -z $LOCATION ];then
+   mkdir /root/$DEFAULT_MOUNT -p
+   mount $DEV /root/$DEFAULT_MOUNT
+   #start supervisord
+   exec /usr/bin/supervisord -n
+   exit
+fi
+if [ -z $DEV ];then
+	echo "error"
+exit
+fi
+mount $DEV $LOCATION
+# 启动服务
+exec /usr/bin/supervisord -n

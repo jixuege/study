@@ -1,0 +1,105 @@
+#!/bin/sh
+
+set -x
+
+DEFAULT_MOUNT="test"
+
+# 未传入参数LOCATION
+if [ "x$LOCATION" == "x" ]&&[ "x$DEV" != "x" ];then
+if [ -a /root/$DEFAULT_MOUNT ];then
+mount $DEV $DEFAULT_MOUNT
+cp  /date/nginx.conf /$DEFAULT_MOUNT
+cp  /date/mime.types /$DEFAULT_MOUNT
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:mongod]
+command=/usr/bin/mongod  --replSet RS_mongo
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/mongod_out.log
+stderr_logfile=/var/log/supervisor/mongod_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+else
+mkdir -p $DEFAULT_MOUNT
+mount $DEV $DEFAULT_MOUNT
+cp  /date/nginx.conf $DEFAULT_MOUNT
+cp  /date/mime.types $DEFAULT_MOUNT
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:mongod]
+command=/usr/bin/mongod  --replSet RS_mongo
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/mongod_out.log
+stderr_logfile=/var/log/supervisor/mongod_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+fi
+
+
+#未传入参数DEV
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" == "x" ];then
+cp  /date/nginx.conf $LOCATION
+cp  /date/mime.types $LOCATION
+#初始化服务配置
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:mongod]
+command=/usr/bin/mongod  --replSet RS_mongo
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/mongod_out.log
+stderr_logfile=/var/log/supervisor/mongod_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+
+
+
+#DEV和LOCATION都传入
+if [ "x$LOCATION" != "x" ]&&[ "x$DEV" != "x" ];then
+if [ -a $LOCATION ];then
+mount $DEV $LOCATION
+cp  /date/nginx.conf $LOCATION
+cp  /date/mime.types $LOCATION
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:mongod]
+command=/usr/bin/mongod  --replSet RS_mongo
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/mongod_out.log
+stderr_logfile=/var/log/supervisor/mongod_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+else
+mkdir -p $LOCATION
+mount $DEV $LOCATION
+cp  /date/nginx.conf $LOCATION
+cp  /date/mime.types $LOCATION
+cat >/etc/supervisord.d/test.conf <<EOF
+[program:mongod]
+command=/usr/bin/mongod  --replSet RS_mongo
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/mongod_out.log
+stderr_logfile=/var/log/supervisor/mongod_err.log
+
+EOF
+#启动服务
+exec /usr/bin/supervisord -n
+exit
+fi
+fi
